@@ -107,6 +107,7 @@ public class FundamentalTest {
         assertEquals(true, Fundamental.containsCertainDigit(0, 0));
         assertEquals(true, Fundamental.containsCertainDigit(-1, 1));
         assertEquals(false, Fundamental.containsCertainDigit(0, 1));
+
         scores += 10;
     }
 
