@@ -3,6 +3,7 @@ package oop.persistence;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import oop.Logger.TransactionLogger;
 import oop.entities.DurableProduct;
 import oop.exceptions.VerificationException;
 import oop.exceptions.PersistenceException;
@@ -33,6 +34,9 @@ public class DurableProductController implements ProductController<DurableProduc
             statement.setInt(10, product.getWarrantyPeriod());
             statement.setDouble(11, product.getGrossWeight());
             statement.executeUpdate();
+            TransactionLogger.logTransaction(product.getArticleNumber(),
+                    TransactionLogger.TransactionType.NEW_PRODUCT, product.
+                            getQuantity());
         } catch (SQLIntegrityConstraintViolationException e) {
             throw new PersistenceException(e.getMessage());
         } catch (SQLException e) {
@@ -59,6 +63,9 @@ public class DurableProductController implements ProductController<DurableProduc
             statement.setDouble(10, product.getGrossWeight());
             statement.setString(11, product.getArticleNumber());
             statement.executeUpdate();
+            TransactionLogger.logTransaction(product.getArticleNumber(),
+                    TransactionLogger.TransactionType.UPDATE, product.
+                            getQuantity());
         } catch (SQLException e) {
             throw new PersistenceException("update failed");
         }
@@ -71,6 +78,9 @@ public class DurableProductController implements ProductController<DurableProduc
                     "DELETE FROM durable_product WHERE article_number = ?");
             statement.setString(1, product.getArticleNumber());
             statement.executeUpdate();
+            TransactionLogger.logTransaction(product.getArticleNumber(),
+                    TransactionLogger.TransactionType.DELETE, product.
+                            getQuantity());
         } catch (SQLException e) {
             throw new PersistenceException("delete failed");
         }

@@ -34,11 +34,13 @@
                       <Component id="btUpdate" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Component id="btDelete" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="-2" pref="250" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="26" max="-2" attributes="0"/>
+                      <Component id="tfSearch" min="-2" pref="128" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="96" max="-2" attributes="0"/>
                       <Component id="btIncrQuantity" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Component id="btDecrQuantity" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="256" max="32767" attributes="0"/>
+                      <EmptySpace pref="297" max="32767" attributes="0"/>
                       <Component id="btExit" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -59,6 +61,7 @@
                   <Component id="btExit" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="btIncrQuantity" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="btDecrQuantity" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="tfSearch" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
@@ -85,8 +88,10 @@
     <Component class="javax.swing.JButton" name="btDelete">
       <Properties>
         <Property name="text" type="java.lang.String" value="Delete Product"/>
-        <Property name="enabled" type="boolean" value="false"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btDeleteActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="btExit">
       <Properties>
@@ -160,18 +165,17 @@
     </Container>
     <Component class="javax.swing.JButton" name="btIncrQuantity">
       <Properties>
-        <Property name="text" type="java.lang.String" value="IncrQuantity"/>
+        <Property name="text" type="java.lang.String" value="Deposit"/>
       </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btIncrQuantityActionPerformed"/>
-      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="btDecrQuantity">
       <Properties>
-        <Property name="text" type="java.lang.String" value="DecrQuantity"/>
+        <Property name="text" type="java.lang.String" value="Withdraw"/>
       </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="tfSearch">
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btDecrQuantityActionPerformed"/>
+        <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="tfSearchKeyReleased"/>
       </Events>
     </Component>
   </SubComponents>

@@ -1,5 +1,6 @@
 package oop.entities;
 
+import java.util.Objects;
 import oop.exceptions.VerificationException;
 import oop.utils.Validator;
 
@@ -32,44 +33,53 @@ abstract class ProductAbstract implements Product {
     }
 
     //<editor-fold defaultstate="collapsed" desc="getters">
+    @Override
     public String getArticleNumber() {
         return articleNumber;
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public String getBrand() {
         return brand;
     }
 
+    @Override
     public String getFamily() {
         return family;
     }
 
+    @Override
     public int getNettoPrice() {
         return nettoPrice;
     }
 
+    @Override
     public int getTaxId() {
         return taxId;
     }
 
+    @Override
     public int getQuantity() {
         return quantity;
     }
 
+    @Override
     public String getAmountUnits() {
         return amountUnits;
     }
 
+    @Override
     public int getCriticalQuantity() {
         return criticalQuantity;
     }
 
     public double getGrossPrice() {
-        return nettoPrice * (1 + (taxId / 100));
+        return nettoPrice * (1.0 + (taxId / 100.0));
     }
 //</editor-fold>
 
@@ -143,6 +153,27 @@ abstract class ProductAbstract implements Product {
     @Override
     public boolean equals(Object obj) {
         return obj instanceof Product
-                && articleNumber.equals(((ProductAbstract) obj).articleNumber);
+                && this.hashCode() == ((ProductAbstract) obj).hashCode();
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 53 * hash + Objects.hashCode(this.articleNumber);
+        hash = 53 * hash + Objects.hashCode(this.name);
+        hash = 53 * hash + Objects.hashCode(this.brand);
+        hash = 53 * hash + Objects.hashCode(this.family);
+        hash = 53 * hash + this.nettoPrice;
+        hash = 53 * hash + this.taxId;
+        hash = 53 * hash + this.quantity;
+        hash = 53 * hash + Objects.hashCode(this.amountUnits);
+        hash = 53 * hash + this.criticalQuantity;
+        return hash;
+    }
+
+    @Override
+    public String toString() {
+        return "Product{" + "articleNumber=" + articleNumber + ", name=" + name + ", brand=" + brand + ", family=" + family + ", nettoPrice=" + nettoPrice + ", taxId=" + taxId + ", quantity=" + quantity + ", amountUnits=" + amountUnits + ", criticalQuantity=" + criticalQuantity + '}';
+    }
+
 }

@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
+import oop.Logger.TransactionLogger;
 import oop.entities.PerishableProduct;
 import oop.exceptions.PersistenceException;
 import oop.exceptions.VerificationException;
@@ -39,6 +40,9 @@ public class PerishableProductController implements ProductController<Perishable
             statement.setDate(10, product.getExpirationDate());
             statement.setDate(11, product.getProductionDate());
             statement.executeUpdate();
+            TransactionLogger.logTransaction(product.getArticleNumber(),
+                    TransactionLogger.TransactionType.NEW_PRODUCT, product.
+                            getQuantity());
         } catch (SQLIntegrityConstraintViolationException e) {
             throw new PersistenceException(e.getMessage());
         } catch (SQLException e) {
@@ -66,6 +70,9 @@ public class PerishableProductController implements ProductController<Perishable
             statement.setDate(10, (Date) product.getProductionDate());
             statement.setString(11, product.getArticleNumber());
             statement.executeUpdate();
+            TransactionLogger.logTransaction(product.getArticleNumber(),
+                    TransactionLogger.TransactionType.UPDATE, product.
+                            getQuantity());
         } catch (SQLException e) {
             throw new PersistenceException("update failed");
         }
@@ -79,6 +86,9 @@ public class PerishableProductController implements ProductController<Perishable
                     "DELETE FROM perishable_product WHERE article_number = ?");
             statement.setString(1, product.getArticleNumber());
             statement.executeUpdate();
+            TransactionLogger.logTransaction(product.getArticleNumber(),
+                    TransactionLogger.TransactionType.DELETE, product.
+                            getQuantity());
         } catch (SQLException e) {
             throw new PersistenceException("delete failed");
         }

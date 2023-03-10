@@ -1,6 +1,5 @@
 package oop.views.tablemodels;
 
-import java.util.Collections;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
 import oop.entities.DurableProduct;
@@ -12,7 +11,6 @@ public class DurableProductTableModel extends AbstractTableModel {
 
     public DurableProductTableModel(List<DurableProduct> data) {
         this.data = data;
-
         columnNames
                 = new String[]{"article_number", "name", "brand", "family", "netto_price", "gross_price", "tax_id",
                     "quantity", "amount_units", "critical_quantity", "warranty_period", "gross_weight"};
