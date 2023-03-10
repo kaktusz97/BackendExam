@@ -1,10 +1,12 @@
 package oop.views;
 
+import javax.swing.JOptionPane;
 import oop.entities.DurableProductHandler;
 import oop.entities.PerishableProductHandler;
 import oop.entities.Product;
 import oop.entities.ProductHandler;
 import oop.utils.ProductType;
+import oop.utils.Util;
 
 /**
  *
@@ -49,6 +51,12 @@ public class DepositWithdrawForm extends javax.swing.JDialog {
 
         lbQuantity.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         lbQuantity.setText("Quantity:");
+
+        tfQuantity.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                tfQuantityKeyTyped(evt);
+            }
+        });
 
         btWithdraw.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         btWithdraw.setText("Withdraw");
@@ -103,16 +111,35 @@ public class DepositWithdrawForm extends javax.swing.JDialog {
     private void btDeposit1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btDeposit1ActionPerformed
         // TODO add your handling code here:
         int q = getQuantity();
-        handler.deposit(product, q);
+        if (tfQuantity.getText().
+                length() > 0) {
+            handler.deposit(product, q);
+        }
         dispose();
     }//GEN-LAST:event_btDeposit1ActionPerformed
 
     private void btWithdrawActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btWithdrawActionPerformed
         // TODO add your handling code here:
         int q = getQuantity();
-        handler.withdraw(product, q);
+        try {
+            if (tfQuantity.getText().
+                    length() > 0) {
+                handler.withdraw(product, q);
+            }
+        } catch (IllegalArgumentException e) {
+            JOptionPane.showMessageDialog(this, "Cannot withdraw more than the available quantity.");
+        }
         dispose();
     }//GEN-LAST:event_btWithdrawActionPerformed
+
+    private void tfQuantityKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tfQuantityKeyTyped
+        // TODO add your handling code here:
+        char c = evt.getKeyChar();
+        if (!Util.isBetween('0', '9', c) && c != '\b' || tfQuantity.getText().
+                length() >= 4) {
+            evt.consume();
+        }
+    }//GEN-LAST:event_tfQuantityKeyTyped
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btDeposit1;

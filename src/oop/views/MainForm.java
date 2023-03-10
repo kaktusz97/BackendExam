@@ -9,9 +9,14 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.RowFilter;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import oop.entities.DurableProduct;
 import oop.entities.DurableProductHandler;
 import oop.entities.PerishableProduct;
@@ -39,6 +44,7 @@ public class MainForm extends javax.swing.JFrame {
     private int tabIndex;
     private ProductEventListener perishableEventListener;
     private ProductEventListener durableEventListener;
+    private TableRowSorter<PerishableProductTableModel> perishableSorter;
 
     /**
      * Creates new form MainForm
@@ -51,6 +57,7 @@ public class MainForm extends javax.swing.JFrame {
         setPerishablePage();
         setDurablePage();
         popAlertIfNecessary();
+        filterSearch();
         perishableEventListener = new PerishableProductListener();
         durableEventListener = new DurableProductListener();
     }
@@ -251,6 +258,40 @@ public class MainForm extends javax.swing.JFrame {
         ProductDeleteForm form = new ProductDeleteForm(this, ProductType.PERISHABLE_PRODUCT, perishableProducts.get(i));
         form.addProductEventListener(perishableEventListener);
         form.setVisible(true);
+    }
+
+    private void filterSearch() {
+        ProductType type = getProductType();
+        tfSearch.getDocument().
+                addDocumentListener(new DocumentListener() {
+                    @Override
+                    public void changedUpdate(DocumentEvent e) {
+                        updateFilter(type);
+                    }
+
+                    @Override
+                    public void insertUpdate(DocumentEvent e) {
+                        updateFilter(type);
+                    }
+
+                    @Override
+                    public void removeUpdate(DocumentEvent e) {
+                        updateFilter(type);
+                    }
+                });
+    }
+
+    private ProductType getProductType() {
+        ProductType result = null;
+        switch (tabIndex) {
+            case 0:
+                result = ProductType.PERISHABLE_PRODUCT;
+                break;
+            case 1:
+                result = ProductType.DURABLE_PRODUCT;
+                break;
+        }
+        return result;
     }
 
     private class PerishableProductListener implements ProductEventListener<PerishableProduct> {
@@ -495,7 +536,6 @@ public class MainForm extends javax.swing.JFrame {
         durableProducts = handler.getAllProducts();
         durableTableModel = new DurableProductTableModel(durableProducts);
         tblDurableProducts.setModel(durableTableModel);
-
     }
 
     private void setTabIndex() {
@@ -507,4 +547,35 @@ public class MainForm extends javax.swing.JFrame {
         });
     }
 
+    private TableRowSorter<AbstractTableModel> initSorter(ProductType type) {
+        TableRowSorter<AbstractTableModel> sorter = null;
+        switch (type) {
+            case DURABLE_PRODUCT:
+                sorter = new TableRowSorter<>(durableTableModel);
+                break;
+            case PERISHABLE_PRODUCT:
+                sorter = new TableRowSorter<>(perishableTableModel);
+                break;
+        }
+        return sorter;
+    }
+
+    private void updateFilter(ProductType type) {
+        TableRowSorter<AbstractTableModel> sorter = initSorter(type);
+        String text = tfSearch.getText().
+                trim();
+        if (text.length() == 0) {
+            sorter.setRowFilter(null);
+        } else {
+            RowFilter<AbstractTableModel, Object> filter = new RowFilter<AbstractTableModel, Object>() {
+                @Override
+                public boolean include(Entry<? extends AbstractTableModel, ? extends Object> entry) {
+                    String name = entry.getStringValue(1);
+                    return name.toLowerCase().
+                            contains(text.toLowerCase());
+                }
+            };
+            sorter.setRowFilter(filter);
+        }
+    }
 }
