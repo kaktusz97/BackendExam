@@ -24,6 +24,7 @@ public class CriticalQuantityAlert extends javax.swing.JDialog {
         super(parent, false);
         initComponents();
         this.data = data;
+        setLocationRelativeTo(null);
     }
 
     /**

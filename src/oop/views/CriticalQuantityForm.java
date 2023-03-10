@@ -17,6 +17,7 @@ public class CriticalQuantityForm extends javax.swing.JDialog {
         super();
         initComponents();
         tblTable.setModel(model);
+        setLocationRelativeTo(null);
     }
 
     /**

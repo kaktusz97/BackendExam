@@ -1,8 +1,15 @@
 package oop.views;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.AbstractTableModel;
@@ -39,6 +46,7 @@ public class MainForm extends javax.swing.JFrame {
      */
     public MainForm() {
         initComponents();
+        setLocationRelativeTo(null);
         tabIndex = 0;
         setTabIndex();
         setPerishablePage();
@@ -68,8 +76,10 @@ public class MainForm extends javax.swing.JFrame {
         btIncrQuantity = new javax.swing.JButton();
         btDecrQuantity = new javax.swing.JButton();
         tfSearch = new javax.swing.JTextField();
+        btSaveLog = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("TheBestProductHandlerProgramEverMade");
         setLocationByPlatform(true);
 
         btNew.setText("New Product");
@@ -100,6 +110,7 @@ public class MainForm extends javax.swing.JFrame {
             }
         });
 
+        tblPerishableProducts.setAutoCreateRowSorter(true);
         tblPerishableProducts.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -111,10 +122,12 @@ public class MainForm extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tblPerishableProducts.setName(""); // NOI18N
         jScrollPane1.setViewportView(tblPerishableProducts);
 
         paneProducts.addTab("Perishable Products", jScrollPane1);
 
+        tblDurableProducts.setAutoCreateRowSorter(true);
         tblDurableProducts.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -140,6 +153,13 @@ public class MainForm extends javax.swing.JFrame {
             }
         });
 
+        btSaveLog.setText("SaveLog");
+        btSaveLog.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btSaveLogActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -156,11 +176,13 @@ public class MainForm extends javax.swing.JFrame {
                         .addComponent(btDelete)
                         .addGap(26, 26, 26)
                         .addComponent(tfSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(96, 96, 96)
+                        .addGap(18, 18, 18)
                         .addComponent(btIncrQuantity)
                         .addGap(18, 18, 18)
                         .addComponent(btDecrQuantity)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 297, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 173, Short.MAX_VALUE)
+                        .addComponent(btSaveLog)
+                        .addGap(127, 127, 127)
                         .addComponent(btExit)))
                 .addContainerGap())
         );
@@ -177,7 +199,8 @@ public class MainForm extends javax.swing.JFrame {
                     .addComponent(btExit)
                     .addComponent(btIncrQuantity)
                     .addComponent(btDecrQuantity)
-                    .addComponent(tfSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(tfSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btSaveLog))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -222,6 +245,20 @@ public class MainForm extends javax.swing.JFrame {
         productEditorForm = new ProductEditorForm(this, ProductType.DURABLE_PRODUCT);
         productEditorForm.addProductEventListener(durableEventListener);
         productEditorForm.setProductHandlingStrategy(new InsertProductStrategy());
+    }
+
+    private void initDurableDelete() {
+        int i = tblDurableProducts.getSelectedRow();
+        ProductDeleteForm form = new ProductDeleteForm(this, ProductType.DURABLE_PRODUCT, durableProducts.get(i));
+        form.addProductEventListener(durableEventListener);
+        form.setVisible(true);
+    }
+
+    private void initPerishableDelete() {
+        int i = tblPerishableProducts.getSelectedRow();
+        ProductDeleteForm form = new ProductDeleteForm(this, ProductType.PERISHABLE_PRODUCT, perishableProducts.get(i));
+        form.addProductEventListener(perishableEventListener);
+        form.setVisible(true);
     }
 
     private class PerishableProductListener implements ProductEventListener<PerishableProduct> {
@@ -269,7 +306,6 @@ public class MainForm extends javax.swing.JFrame {
 
         private void drawTable() {
             durableTableModel.fireTableDataChanged();
-
         }
     }
     private void btNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btNewActionPerformed
@@ -319,25 +355,39 @@ public class MainForm extends javax.swing.JFrame {
     }//GEN-LAST:event_tfSearchKeyReleased
 
     private void btDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btDeleteActionPerformed
-        ProductDeleteForm form = null;
+
         switch (tabIndex) {
             case 0:
                 if (tblPerishableProducts.getSelectedRow() > -1 && !perishableProducts.isEmpty()) {
-                    int i = tblPerishableProducts.getSelectedRow();
-                    form = new ProductDeleteForm(this, ProductType.PERISHABLE_PRODUCT, perishableProducts.get(i));
-                    form.addProductEventListener(perishableEventListener);
+
+                    initPerishableDelete();
                 }
                 break;
             case 1:
                 if (tblDurableProducts.getSelectedRow() > -1 && !durableProducts.isEmpty()) {
-                    int i = tblDurableProducts.getSelectedRow();
-                    form = new ProductDeleteForm(this, ProductType.DURABLE_PRODUCT, durableProducts.get(i));
-                    form.addProductEventListener(durableEventListener);
+                    initDurableDelete();
                 }
                 break;
         }
-        form.setVisible(true);
     }//GEN-LAST:event_btDeleteActionPerformed
+
+    private void btSaveLogActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btSaveLogActionPerformed
+        File logFile = new File("savedtransactions.log");
+        JFileChooser fileChooser = new JFileChooser();
+        int userSelection = fileChooser.showSaveDialog(this);
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            File saveFile = fileChooser.getSelectedFile();
+            try {
+                Files.copy(logFile.toPath(), saveFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                try ( FileWriter writer = new FileWriter(logFile)) {
+                    writer.write("");
+                }
+                JOptionPane.showMessageDialog(this, "File saved successfully.");
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(this, "Error while saving the file: " + e.getMessage());
+            }
+        }
+    }//GEN-LAST:event_btSaveLogActionPerformed
 
     private void initPerishableUpdate() {
         int index = tblPerishableProducts.getSelectedRow();
@@ -413,6 +463,7 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JButton btExit;
     private javax.swing.JButton btIncrQuantity;
     private javax.swing.JButton btNew;
+    private javax.swing.JButton btSaveLog;
     private javax.swing.JButton btUpdate;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;

@@ -31,6 +31,7 @@ public class ProductDeleteForm extends javax.swing.JDialog {
     public ProductDeleteForm(java.awt.Frame parent, ProductType type, Product p) {
         super(parent, false);
         initComponents();
+        setLocationRelativeTo(null);
         this.p = p;
         this.type = type;
         setHandler();
