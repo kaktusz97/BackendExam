@@ -18,4 +18,8 @@ public interface ProductHandler<T extends Product> {
     T getProductByArticleNumber(String articleNumber);
 
     List<T> getAllProducts();
+
+    public void deposit(T product, int quantity);
+
+    public void withdraw(T product, int quantity);
 }

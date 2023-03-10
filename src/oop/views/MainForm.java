@@ -7,7 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.event.ChangeEvent;
@@ -73,8 +72,7 @@ public class MainForm extends javax.swing.JFrame {
         tblPerishableProducts = new javax.swing.JTable();
         jScrollPane2 = new javax.swing.JScrollPane();
         tblDurableProducts = new javax.swing.JTable();
-        btIncrQuantity = new javax.swing.JButton();
-        btDecrQuantity = new javax.swing.JButton();
+        btDepWith = new javax.swing.JButton();
         tfSearch = new javax.swing.JTextField();
         btSaveLog = new javax.swing.JButton();
 
@@ -143,9 +141,12 @@ public class MainForm extends javax.swing.JFrame {
 
         paneProducts.addTab("Durable Products", jScrollPane2);
 
-        btIncrQuantity.setText("Deposit");
-
-        btDecrQuantity.setText("Withdraw");
+        btDepWith.setText("Deposit/Withdraw");
+        btDepWith.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btDepWithActionPerformed(evt);
+            }
+        });
 
         tfSearch.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
@@ -176,11 +177,9 @@ public class MainForm extends javax.swing.JFrame {
                         .addComponent(btDelete)
                         .addGap(26, 26, 26)
                         .addComponent(tfSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(btIncrQuantity)
-                        .addGap(18, 18, 18)
-                        .addComponent(btDecrQuantity)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 173, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 60, Short.MAX_VALUE)
+                        .addComponent(btDepWith)
+                        .addGap(174, 174, 174)
                         .addComponent(btSaveLog)
                         .addGap(127, 127, 127)
                         .addComponent(btExit)))
@@ -197,8 +196,7 @@ public class MainForm extends javax.swing.JFrame {
                     .addComponent(btUpdate)
                     .addComponent(btDelete)
                     .addComponent(btExit)
-                    .addComponent(btIncrQuantity)
-                    .addComponent(btDecrQuantity)
+                    .addComponent(btDepWith)
                     .addComponent(tfSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btSaveLog))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -227,12 +225,6 @@ public class MainForm extends javax.swing.JFrame {
     private void popAlertWindow(List<Product> list) {
         CriticalQuantityAlert alert = new CriticalQuantityAlert(this, list);
         alert.setVisible(true);
-    }
-
-    private void searchPerishableProduct(String scan) {
-    }
-
-    private void searchDurableProduct(String scan) {
     }
 
     private void initPerishableInsert() {
@@ -341,25 +333,13 @@ public class MainForm extends javax.swing.JFrame {
 
     private void tfSearchKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tfSearchKeyReleased
         // TODO add your handling code here:
-        Scanner scanner = new Scanner(tfSearch.getText());
-        String scan = scanner.nextLine();
-        switch (tabIndex) {
-            case 0:
-                searchPerishableProduct(scan);
-                break;
-            case 1:
-                searchDurableProduct(scan);
-                break;
-        }
 
     }//GEN-LAST:event_tfSearchKeyReleased
 
     private void btDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btDeleteActionPerformed
-
         switch (tabIndex) {
             case 0:
                 if (tblPerishableProducts.getSelectedRow() > -1 && !perishableProducts.isEmpty()) {
-
                     initPerishableDelete();
                 }
                 break;
@@ -388,6 +368,36 @@ public class MainForm extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_btSaveLogActionPerformed
+
+    private void btDepWithActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btDepWithActionPerformed
+        // TODO add your handling code here:
+        switch (tabIndex) {
+            case 0:
+                if (tblPerishableProducts.getSelectedRow() > -1 && !perishableProducts.isEmpty()) {
+                    initPerishableDepositWithdrawForm(perishableProducts);
+                }
+                break;
+            case 1:
+                if (tblDurableProducts.getSelectedRow() > -1 && !durableProducts.isEmpty()) {
+                    initDurableDepositWithdrawForm(durableProducts);
+                }
+                break;
+        }
+    }//GEN-LAST:event_btDepWithActionPerformed
+
+    private void initPerishableDepositWithdrawForm(List<PerishableProduct> list) {
+        int index = tblPerishableProducts.getSelectedRow();
+        Product p = list.get(index);
+        DepositWithdrawForm form = new DepositWithdrawForm(ProductType.PERISHABLE_PRODUCT, p);
+        form.setVisible(true);
+    }
+
+    private void initDurableDepositWithdrawForm(List<DurableProduct> list) {
+        int index = tblDurableProducts.getSelectedRow();
+        Product p = list.get(index);
+        DepositWithdrawForm form = new DepositWithdrawForm(ProductType.DURABLE_PRODUCT, p);
+        form.setVisible(true);
+    }
 
     private void initPerishableUpdate() {
         int index = tblPerishableProducts.getSelectedRow();
@@ -458,10 +468,9 @@ public class MainForm extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btDecrQuantity;
     private javax.swing.JButton btDelete;
+    private javax.swing.JButton btDepWith;
     private javax.swing.JButton btExit;
-    private javax.swing.JButton btIncrQuantity;
     private javax.swing.JButton btNew;
     private javax.swing.JButton btSaveLog;
     private javax.swing.JButton btUpdate;

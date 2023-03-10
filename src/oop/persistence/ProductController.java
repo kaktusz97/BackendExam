@@ -19,4 +19,8 @@ public interface ProductController<T extends Product> {
     public T getProductByArticleNumber(String articleNumber);
 
     public List<T> getAllProducts();
+
+    public void deposit(T product, int quantity);
+
+    public void withdraw(T product, int quantity);
 }

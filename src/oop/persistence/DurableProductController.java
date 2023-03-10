@@ -147,4 +147,33 @@ public class DurableProductController implements ProductController<DurableProduc
         }
         return products;
     }
+
+    @Override
+    public void deposit(DurableProduct product, int quantity) {
+        int newQuantity = product.getQuantity() + quantity;
+        updateQuantity(product, newQuantity);
+    }
+
+    @Override
+    public void withdraw(DurableProduct product, int quantity) {
+        int newQuantity = product.getQuantity() - quantity;
+        if (newQuantity < 0) {
+            throw new IllegalArgumentException("Cannot withdraw more than the available quantity.");
+        }
+        updateQuantity(product, newQuantity);
+    }
+
+    private void updateQuantity(DurableProduct product, int newQuantity) {
+        String sql = "UPDATE durable_product SET quantity = ? WHERE article_number = ?";
+        try ( PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, newQuantity);
+            stmt.setString(2, product.getArticleNumber());
+            stmt.executeUpdate();
+            product.setQuantity(newQuantity);
+        } catch (SQLException ex) {
+            throw new PersistenceException("Cannot update quantity");
+        } catch (VerificationException ex) {
+            throw new PersistenceException("Cannot set quantity");
+        }
+    }
 }

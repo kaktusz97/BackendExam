@@ -35,4 +35,14 @@ public class DurableProductHandler implements ProductHandler {
         return controller.getProductByArticleNumber(articleNumber);
     }
 
+    @Override
+    public void deposit(Product product, int quantity) {
+        controller.deposit(product, quantity);
+    }
+
+    @Override
+    public void withdraw(Product product, int quantity) {
+        controller.withdraw(product, quantity);
+    }
+
 }
