@@ -1,5 +1,7 @@
 package oop.views;
 
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -12,8 +14,6 @@ import javax.swing.JOptionPane;
 import javax.swing.RowFilter;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
@@ -37,14 +37,13 @@ public class MainForm extends javax.swing.JFrame {
 
     private AbstractTableModel perishableTableModel;
     private AbstractTableModel durableTableModel;
-    private ProductHandler handler;
     private List<PerishableProduct> perishableProducts;
     private List<DurableProduct> durableProducts;
-    private ProductEditorForm productEditorForm;
-    private int tabIndex;
     private ProductEventListener perishableEventListener;
     private ProductEventListener durableEventListener;
-    private TableRowSorter<PerishableProductTableModel> perishableSorter;
+    private ProductEditorForm productEditorForm;
+    private ProductHandler handler;
+    private int tabIndex;
 
     /**
      * Creates new form MainForm
@@ -57,7 +56,7 @@ public class MainForm extends javax.swing.JFrame {
         setPerishablePage();
         setDurablePage();
         popAlertIfNecessary();
-        filterSearch();
+        filterTableByName();
         perishableEventListener = new PerishableProductListener();
         durableEventListener = new DurableProductListener();
     }
@@ -155,12 +154,6 @@ public class MainForm extends javax.swing.JFrame {
             }
         });
 
-        tfSearch.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                tfSearchKeyReleased(evt);
-            }
-        });
-
         btSaveLog.setText("SaveLog");
         btSaveLog.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -238,12 +231,16 @@ public class MainForm extends javax.swing.JFrame {
         productEditorForm = new ProductEditorForm(this, ProductType.PERISHABLE_PRODUCT);
         productEditorForm.addProductEventListener(perishableEventListener);
         productEditorForm.setProductHandlingStrategy(new InsertProductStrategy());
+        productEditorForm.setVisible(true);
+
     }
 
     private void initDurableInsert() {
         productEditorForm = new ProductEditorForm(this, ProductType.DURABLE_PRODUCT);
         productEditorForm.addProductEventListener(durableEventListener);
         productEditorForm.setProductHandlingStrategy(new InsertProductStrategy());
+        productEditorForm.setVisible(true);
+
     }
 
     private void initDurableDelete() {
@@ -260,38 +257,59 @@ public class MainForm extends javax.swing.JFrame {
         form.setVisible(true);
     }
 
-    private void filterSearch() {
-        ProductType type = getProductType();
-        tfSearch.getDocument().
-                addDocumentListener(new DocumentListener() {
-                    @Override
-                    public void changedUpdate(DocumentEvent e) {
-                        updateFilter(type);
-                    }
-
-                    @Override
-                    public void insertUpdate(DocumentEvent e) {
-                        updateFilter(type);
-                    }
-
-                    @Override
-                    public void removeUpdate(DocumentEvent e) {
-                        updateFilter(type);
-                    }
-                });
-    }
-
-    private ProductType getProductType() {
-        ProductType result = null;
+    private void filterTableByName() {
         switch (tabIndex) {
             case 0:
-                result = ProductType.PERISHABLE_PRODUCT;
+                if (tblPerishableProducts.getSelectedRow() > -1 && !perishableProducts.isEmpty()) {
+                    filterPerishableTable();
+                }
                 break;
             case 1:
-                result = ProductType.DURABLE_PRODUCT;
+                if (tblDurableProducts.getSelectedRow() > -1 && !durableProducts.isEmpty()) {
+                    filterDurableTable();
+                }
                 break;
         }
-        return result;
+    }
+
+    private void filterPerishableTable() {
+        tfSearch.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                String search = tfSearch.getText().
+                        toLowerCase();
+                TableRowSorter<TableModel> sorter = new TableRowSorter<>(tblPerishableProducts.getModel());
+                sorter.setRowFilter(RowFilter.regexFilter("(?i)" + search, 1));
+                tblPerishableProducts.setRowSorter(sorter);
+            }
+        });
+        refreshPerishableTable();
+    }
+
+    private void filterDurableTable() {
+        tfSearch.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                String search = tfSearch.getText().
+                        toLowerCase();
+                TableRowSorter<TableModel> sorter = new TableRowSorter<>(tblDurableProducts.getModel());
+                sorter.setRowFilter(RowFilter.regexFilter("(?i)" + search, 1));
+                tblDurableProducts.setRowSorter(sorter);
+            }
+        });
+        refreshDurableTable();
+    }
+
+    private void refreshDurableTable() {
+        List<DurableProduct> productList = handler.getAllProducts();
+        DurableProductTableModel model = new DurableProductTableModel(productList);
+        tblDurableProducts.setModel(model);
+    }
+
+    private void refreshPerishableTable() {
+        List<PerishableProduct> productList = handler.getAllProducts();
+        PerishableProductTableModel model = new PerishableProductTableModel(productList);
+        tblPerishableProducts.setModel(model);
     }
 
     private class PerishableProductListener implements ProductEventListener<PerishableProduct> {
@@ -304,6 +322,7 @@ public class MainForm extends javax.swing.JFrame {
 
         @Override
         public void productUpdated(PerishableProduct p) {
+            updateProduct(p);
             drawTable();
         }
 
@@ -315,6 +334,21 @@ public class MainForm extends javax.swing.JFrame {
 
         private void drawTable() {
             perishableTableModel.fireTableDataChanged();
+            tblPerishableProducts.repaint();
+        }
+
+        private void updateProduct(PerishableProduct updatedProduct) {
+            int i = 0;
+            boolean productFound = false;
+            while (i < perishableProducts.size() && !productFound) {
+                if (perishableProducts.get(i).
+                        getArticleNumber().
+                        equals(updatedProduct.getArticleNumber())) {
+                    perishableProducts.set(i, updatedProduct);
+                    productFound = true;
+                }
+                i++;
+            }
         }
     }
 
@@ -328,6 +362,7 @@ public class MainForm extends javax.swing.JFrame {
 
         @Override
         public void productUpdated(DurableProduct p) {
+            updateProduct(p);
             drawTable();
         }
 
@@ -339,8 +374,24 @@ public class MainForm extends javax.swing.JFrame {
 
         private void drawTable() {
             durableTableModel.fireTableDataChanged();
+            tblDurableProducts.repaint();
+        }
+
+        private void updateProduct(DurableProduct updatedProduct) {
+            int i = 0;
+            boolean productFound = false;
+            while (i < durableProducts.size() && !productFound) {
+                if (durableProducts.get(i).
+                        getArticleNumber().
+                        equals(updatedProduct.getArticleNumber())) {
+                    durableProducts.set(i, updatedProduct);
+                    productFound = true;
+                }
+                i++;
+            }
         }
     }
+
     private void btNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btNewActionPerformed
         switch (tabIndex) {
             case 0:
@@ -350,7 +401,6 @@ public class MainForm extends javax.swing.JFrame {
                 initDurableInsert();
                 break;
         }
-        productEditorForm.setVisible(true);
     }//GEN-LAST:event_btNewActionPerformed
 
     private void btExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btExitActionPerformed
@@ -372,11 +422,6 @@ public class MainForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btUpdateActionPerformed
 
-    private void tfSearchKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tfSearchKeyReleased
-        // TODO add your handling code here:
-
-    }//GEN-LAST:event_tfSearchKeyReleased
-
     private void btDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btDeleteActionPerformed
         switch (tabIndex) {
             case 0:
@@ -393,7 +438,7 @@ public class MainForm extends javax.swing.JFrame {
     }//GEN-LAST:event_btDeleteActionPerformed
 
     private void btSaveLogActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btSaveLogActionPerformed
-        File logFile = new File("savedtransactions.log");
+        File logFile = new File("transactions.log");
         JFileChooser fileChooser = new JFileChooser();
         int userSelection = fileChooser.showSaveDialog(this);
         if (userSelection == JFileChooser.APPROVE_OPTION) {
@@ -405,7 +450,7 @@ public class MainForm extends javax.swing.JFrame {
                 }
                 JOptionPane.showMessageDialog(this, "File saved successfully.");
             } catch (IOException e) {
-                JOptionPane.showMessageDialog(this, "Error while saving the file: " + e.getMessage());
+                JOptionPane.showMessageDialog(this, "There is nothing to save.");
             }
         }
     }//GEN-LAST:event_btSaveLogActionPerformed
@@ -430,6 +475,7 @@ public class MainForm extends javax.swing.JFrame {
         int index = tblPerishableProducts.getSelectedRow();
         Product p = list.get(index);
         DepositWithdrawForm form = new DepositWithdrawForm(ProductType.PERISHABLE_PRODUCT, p);
+        form.addProductEventListener(perishableEventListener);
         form.setVisible(true);
     }
 
@@ -437,6 +483,7 @@ public class MainForm extends javax.swing.JFrame {
         int index = tblDurableProducts.getSelectedRow();
         Product p = list.get(index);
         DepositWithdrawForm form = new DepositWithdrawForm(ProductType.DURABLE_PRODUCT, p);
+        form.addProductEventListener(durableEventListener);
         form.setVisible(true);
     }
 

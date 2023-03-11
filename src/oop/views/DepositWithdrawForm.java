@@ -1,5 +1,7 @@
 package oop.views;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JOptionPane;
 import oop.entities.DurableProductHandler;
 import oop.entities.PerishableProductHandler;
@@ -7,6 +9,7 @@ import oop.entities.Product;
 import oop.entities.ProductHandler;
 import oop.utils.ProductType;
 import oop.utils.Util;
+import oop.views.strategies.UpdateProductStrategy;
 
 /**
  *
@@ -17,6 +20,8 @@ public class DepositWithdrawForm extends javax.swing.JDialog {
     private ProductHandler handler;
     private Product product;
     private ProductType type;
+    private List<ProductEventListener> listeners;
+    private ProductHandlingStrategy strategy;
 
     /**
      * Creates new form DepositWithdrawForm
@@ -28,10 +33,26 @@ public class DepositWithdrawForm extends javax.swing.JDialog {
         super();
         setModal(false);
         initComponents();
+        listeners = new ArrayList<>();
+        strategy = new UpdateProductStrategy();
         this.type = type;
         setHandler();
         this.product = product;
         setLocationRelativeTo(null);
+    }
+
+    public void addProductEventListener(ProductEventListener l) {
+        listeners.add(l);
+    }
+
+    public void removeProductEventListener(ProductEventListener l) {
+        listeners.remove(l);
+    }
+
+    private void notifyListeners(Product product) {
+        for (ProductEventListener listener : listeners) {
+            strategy.notify(product, listener);
+        }
     }
 
     /**
@@ -115,6 +136,7 @@ public class DepositWithdrawForm extends javax.swing.JDialog {
                 length() > 0) {
             handler.deposit(product, q);
         }
+        notifyListeners(product);
         dispose();
     }//GEN-LAST:event_btDeposit1ActionPerformed
 
@@ -125,11 +147,12 @@ public class DepositWithdrawForm extends javax.swing.JDialog {
             if (tfQuantity.getText().
                     length() > 0) {
                 handler.withdraw(product, q);
+                notifyListeners(product);
+                dispose();
             }
         } catch (IllegalArgumentException e) {
             JOptionPane.showMessageDialog(this, "Cannot withdraw more than the available quantity.");
         }
-        dispose();
     }//GEN-LAST:event_btWithdrawActionPerformed
 
     private void tfQuantityKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tfQuantityKeyTyped

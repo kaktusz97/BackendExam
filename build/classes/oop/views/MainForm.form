@@ -176,9 +176,6 @@
       </Events>
     </Component>
     <Component class="javax.swing.JTextField" name="tfSearch">
-      <Events>
-        <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="tfSearchKeyReleased"/>
-      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="btSaveLog">
       <Properties>
