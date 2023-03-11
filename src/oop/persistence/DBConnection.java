@@ -1,29 +1,52 @@
 package oop.persistence;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.sql.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Properties;
+import oop.exceptions.PersistenceException;
 
 public class DBConnection {
 
     private static Connection connection;
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/storage";
-    private static final String USER = "root";
-    private static final String PASS = "1997marci";
+
+    private static String url;
+    private static String username;
+    private static String password;
+
+    static {
+        initProperties();
+    }
+
+    private DBConnection() {
+    }
+
+    private static void initProperties() {
+        try {
+            Properties props = new Properties();
+            FileInputStream fis = new FileInputStream("config.properties.txt");
+            props.load(fis);
+            url = props.getProperty("db.url");
+            username = props.getProperty("db.username");
+            password = props.getProperty("db.password");
+            fis.close();
+        } catch (IOException ex) {
+            throw new PersistenceException("Config file not found.");
+        }
+    }
 
     public static Connection getDatabaseConnection() {
         if (connection == null) {
             try {
-                connection = DriverManager.getConnection(DB_URL, USER, PASS);
+                connection = DriverManager.getConnection(url, username, password);
             } catch (SQLException ex) {
-                Logger.getLogger(DBConnection.class.getName()).
-                        log(Level.SEVERE, null, ex);
+                throw new PersistenceException("Connecting to database failed");
             }
         }
         return connection;
     }
 
-    static void closeConnection() throws SQLException {
+    public static void closeConnection() throws SQLException {
         if (connection != null) {
             connection.close();
         }

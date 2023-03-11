@@ -40,10 +40,10 @@
                           <Component id="jLabel1" max="32767" attributes="0"/>
                           <Component id="tfSearch" max="32767" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="34" max="32767" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
                       <Component id="btDepWith" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="174" max="-2" attributes="0"/>
-                      <Component id="btSaveLog" min="-2" max="-2" attributes="0"/>
+                      <Component id="btSaveTransactions" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="127" max="-2" attributes="0"/>
                       <Component id="btExit" min="-2" max="-2" attributes="0"/>
                   </Group>
@@ -67,7 +67,7 @@
                   <Component id="btExit" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="btDepWith" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="tfSearch" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="btSaveLog" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="btSaveTransactions" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace pref="8" max="32767" attributes="0"/>
           </Group>
@@ -185,12 +185,12 @@
         <EventHandler event="keyTyped" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="tfSearchKeyTyped"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JButton" name="btSaveLog">
+    <Component class="javax.swing.JButton" name="btSaveTransactions">
       <Properties>
-        <Property name="text" type="java.lang.String" value="SaveLog"/>
+        <Property name="text" type="java.lang.String" value="SaveTransactions"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btSaveLogActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btSaveTransactionsActionPerformed"/>
       </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel1">

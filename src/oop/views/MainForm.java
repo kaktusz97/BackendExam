@@ -80,7 +80,7 @@ public class MainForm extends javax.swing.JFrame {
         tblDurableProducts = new javax.swing.JTable();
         btDepWith = new javax.swing.JButton();
         tfSearch = new javax.swing.JTextField();
-        btSaveLog = new javax.swing.JButton();
+        btSaveTransactions = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -161,10 +161,10 @@ public class MainForm extends javax.swing.JFrame {
             }
         });
 
-        btSaveLog.setText("SaveLog");
-        btSaveLog.addActionListener(new java.awt.event.ActionListener() {
+        btSaveTransactions.setText("SaveTransactions");
+        btSaveTransactions.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btSaveLogActionPerformed(evt);
+                btSaveTransactionsActionPerformed(evt);
             }
         });
 
@@ -189,10 +189,10 @@ public class MainForm extends javax.swing.JFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(tfSearch))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 34, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btDepWith)
                         .addGap(174, 174, 174)
-                        .addComponent(btSaveLog)
+                        .addComponent(btSaveTransactions)
                         .addGap(127, 127, 127)
                         .addComponent(btExit)))
                 .addContainerGap())
@@ -212,7 +212,7 @@ public class MainForm extends javax.swing.JFrame {
                     .addComponent(btExit)
                     .addComponent(btDepWith)
                     .addComponent(tfSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btSaveLog))
+                    .addComponent(btSaveTransactions))
                 .addContainerGap(8, Short.MAX_VALUE))
         );
 
@@ -440,7 +440,7 @@ public class MainForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btDeleteActionPerformed
 
-    private void btSaveLogActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btSaveLogActionPerformed
+    private void btSaveTransactionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btSaveTransactionsActionPerformed
         File logFile = new File("transactions.log");
         JFileChooser fileChooser = new JFileChooser();
         int userSelection = fileChooser.showSaveDialog(this);
@@ -456,7 +456,7 @@ public class MainForm extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(this, "There is nothing to save.");
             }
         }
-    }//GEN-LAST:event_btSaveLogActionPerformed
+    }//GEN-LAST:event_btSaveTransactionsActionPerformed
 
     private void btDepWithActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btDepWithActionPerformed
         switch (tabIndex) {
@@ -569,7 +569,7 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JButton btDepWith;
     private javax.swing.JButton btExit;
     private javax.swing.JButton btNew;
-    private javax.swing.JButton btSaveLog;
+    private javax.swing.JButton btSaveTransactions;
     private javax.swing.JButton btUpdate;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
