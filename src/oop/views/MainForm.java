@@ -81,6 +81,7 @@ public class MainForm extends javax.swing.JFrame {
         btDepWith = new javax.swing.JButton();
         tfSearch = new javax.swing.JTextField();
         btSaveLog = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("TheBestProductHandlerProgramEverMade");
@@ -161,6 +162,9 @@ public class MainForm extends javax.swing.JFrame {
             }
         });
 
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
+        jLabel1.setText("Filter By Product Name:");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -176,7 +180,9 @@ public class MainForm extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addComponent(btDelete)
                         .addGap(26, 26, 26)
-                        .addComponent(tfSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(tfSearch, javax.swing.GroupLayout.DEFAULT_SIZE, 128, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 60, Short.MAX_VALUE)
                         .addComponent(btDepWith)
                         .addGap(174, 174, 174)
@@ -190,7 +196,9 @@ public class MainForm extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(paneProducts, javax.swing.GroupLayout.PREFERRED_SIZE, 478, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel1)
+                .addGap(2, 2, 2)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btNew)
                     .addComponent(btUpdate)
@@ -199,7 +207,7 @@ public class MainForm extends javax.swing.JFrame {
                     .addComponent(btDepWith)
                     .addComponent(tfSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btSaveLog))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(8, Short.MAX_VALUE))
         );
 
         pack();
@@ -260,56 +268,61 @@ public class MainForm extends javax.swing.JFrame {
     private void filterTableByName() {
         switch (tabIndex) {
             case 0:
-                if (tblPerishableProducts.getSelectedRow() > -1 && !perishableProducts.isEmpty()) {
-                    filterPerishableTable();
+                if (!perishableProducts.isEmpty()) {
+                    filterPerishableTableByName();
                 }
                 break;
             case 1:
-                if (tblDurableProducts.getSelectedRow() > -1 && !durableProducts.isEmpty()) {
-                    filterDurableTable();
+                if (!durableProducts.isEmpty()) {
+                    filterDurableTableByName();
                 }
                 break;
         }
     }
 
-    private void filterPerishableTable() {
+    private void filterPerishableTableByName() {
         tfSearch.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
-                String search = tfSearch.getText().
-                        toLowerCase();
-                TableRowSorter<TableModel> sorter = new TableRowSorter<>(tblPerishableProducts.getModel());
-                sorter.setRowFilter(RowFilter.regexFilter("(?i)" + search, 1));
-                tblPerishableProducts.setRowSorter(sorter);
+                filterPerishableTable(tfSearch.getText().
+                        toLowerCase());
             }
         });
+    }
+
+    private void filterDurableTableByName() {
+        tfSearch.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                filterDurableTable(tfSearch.getText().
+                        toLowerCase());
+            }
+        });
+    }
+
+    private void filterPerishableTable(String search) {
+        TableRowSorter<TableModel> sorter = new TableRowSorter<>(tblPerishableProducts.getModel());
+        sorter.setRowFilter(RowFilter.regexFilter("(?i)" + search, 1));
+        tblPerishableProducts.setRowSorter(sorter);
         refreshPerishableTable();
     }
 
-    private void filterDurableTable() {
-        tfSearch.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent e) {
-                String search = tfSearch.getText().
-                        toLowerCase();
-                TableRowSorter<TableModel> sorter = new TableRowSorter<>(tblDurableProducts.getModel());
-                sorter.setRowFilter(RowFilter.regexFilter("(?i)" + search, 1));
-                tblDurableProducts.setRowSorter(sorter);
-            }
-        });
+    private void filterDurableTable(String search) {
+        TableRowSorter<TableModel> sorter = new TableRowSorter<>(tblDurableProducts.getModel());
+        sorter.setRowFilter(RowFilter.regexFilter("(?i)" + search, 1));
+        tblDurableProducts.setRowSorter(sorter);
         refreshDurableTable();
     }
 
     private void refreshDurableTable() {
-        List<DurableProduct> productList = handler.getAllProducts();
-        DurableProductTableModel model = new DurableProductTableModel(productList);
-        tblDurableProducts.setModel(model);
+        durableTableModel.fireTableDataChanged();
+        tblDurableProducts.repaint();
     }
 
     private void refreshPerishableTable() {
-        List<PerishableProduct> productList = handler.getAllProducts();
-        PerishableProductTableModel model = new PerishableProductTableModel(productList);
-        tblPerishableProducts.setModel(model);
+        perishableTableModel.fireTableDataChanged();
+        tblPerishableProducts.repaint();
+
     }
 
     private class PerishableProductListener implements ProductEventListener<PerishableProduct> {
@@ -562,6 +575,7 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JButton btNew;
     private javax.swing.JButton btSaveLog;
     private javax.swing.JButton btUpdate;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTabbedPane paneProducts;
@@ -594,35 +608,4 @@ public class MainForm extends javax.swing.JFrame {
         });
     }
 
-    private TableRowSorter<AbstractTableModel> initSorter(ProductType type) {
-        TableRowSorter<AbstractTableModel> sorter = null;
-        switch (type) {
-            case DURABLE_PRODUCT:
-                sorter = new TableRowSorter<>(durableTableModel);
-                break;
-            case PERISHABLE_PRODUCT:
-                sorter = new TableRowSorter<>(perishableTableModel);
-                break;
-        }
-        return sorter;
-    }
-
-    private void updateFilter(ProductType type) {
-        TableRowSorter<AbstractTableModel> sorter = initSorter(type);
-        String text = tfSearch.getText().
-                trim();
-        if (text.length() == 0) {
-            sorter.setRowFilter(null);
-        } else {
-            RowFilter<AbstractTableModel, Object> filter = new RowFilter<AbstractTableModel, Object>() {
-                @Override
-                public boolean include(Entry<? extends AbstractTableModel, ? extends Object> entry) {
-                    String name = entry.getStringValue(1);
-                    return name.toLowerCase().
-                            contains(text.toLowerCase());
-                }
-            };
-            sorter.setRowFilter(filter);
-        }
-    }
 }
