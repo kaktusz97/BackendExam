@@ -152,6 +152,9 @@ public class DurableProductController implements ProductController<DurableProduc
     public void deposit(DurableProduct product, int quantity) {
         int newQuantity = product.getQuantity() + quantity;
         updateQuantity(product, newQuantity);
+        TransactionLogger.logTransaction(product.getArticleNumber(),
+                TransactionLogger.TransactionType.DEPOSIT, product.
+                        getQuantity());
     }
 
     @Override
@@ -161,6 +164,9 @@ public class DurableProductController implements ProductController<DurableProduc
             throw new IllegalArgumentException("Cannot withdraw more than the available quantity.");
         }
         updateQuantity(product, newQuantity);
+        TransactionLogger.logTransaction(product.getArticleNumber(),
+                TransactionLogger.TransactionType.WITHDRAWAL, product.
+                        getQuantity());
     }
 
     private void updateQuantity(DurableProduct product, int newQuantity) {

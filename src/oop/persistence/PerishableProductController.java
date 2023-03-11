@@ -161,6 +161,9 @@ public class PerishableProductController implements ProductController<Perishable
     public void deposit(PerishableProduct product, int quantity) {
         int newQuantity = product.getQuantity() + quantity;
         updateQuantity(product, newQuantity);
+        TransactionLogger.logTransaction(product.getArticleNumber(),
+                TransactionLogger.TransactionType.DEPOSIT, product.
+                        getQuantity());
     }
 
     @Override
@@ -170,6 +173,9 @@ public class PerishableProductController implements ProductController<Perishable
             throw new IllegalArgumentException("Cannot withdraw more than the available quantity.");
         }
         updateQuantity(product, newQuantity);
+        TransactionLogger.logTransaction(product.getArticleNumber(),
+                TransactionLogger.TransactionType.WITHDRAWAL, product.
+                        getQuantity());
     }
 
     private void updateQuantity(PerishableProduct product, int newQuantity) {
