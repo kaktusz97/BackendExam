@@ -14,7 +14,6 @@ import javax.swing.JOptionPane;
 import javax.swing.RowFilter;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import oop.entities.DurableProduct;
@@ -24,6 +23,7 @@ import oop.entities.PerishableProductHandler;
 import oop.entities.Product;
 import oop.entities.ProductHandler;
 import oop.utils.ProductType;
+import oop.utils.Util;
 import oop.views.strategies.InsertProductStrategy;
 import oop.views.strategies.UpdateProductStrategy;
 import oop.views.tablemodels.DurableProductTableModel;
@@ -35,8 +35,8 @@ import oop.views.tablemodels.PerishableProductTableModel;
  */
 public class MainForm extends javax.swing.JFrame {
 
-    private AbstractTableModel perishableTableModel;
-    private AbstractTableModel durableTableModel;
+    private PerishableProductTableModel perishableTableModel;
+    private DurableProductTableModel durableTableModel;
     private List<PerishableProduct> perishableProducts;
     private List<DurableProduct> durableProducts;
     private ProductEventListener perishableEventListener;
@@ -56,7 +56,7 @@ public class MainForm extends javax.swing.JFrame {
         setPerishablePage();
         setDurablePage();
         popAlertIfNecessary();
-        filterTableByName();
+        filterTablesByName();
         perishableEventListener = new PerishableProductListener();
         durableEventListener = new DurableProductListener();
     }
@@ -155,6 +155,12 @@ public class MainForm extends javax.swing.JFrame {
             }
         });
 
+        tfSearch.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                tfSearchKeyTyped(evt);
+            }
+        });
+
         btSaveLog.setText("SaveLog");
         btSaveLog.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -163,7 +169,7 @@ public class MainForm extends javax.swing.JFrame {
         });
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
-        jLabel1.setText("Filter By Product Name:");
+        jLabel1.setText("Filter by ArticleNumber or Name:");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -182,8 +188,8 @@ public class MainForm extends javax.swing.JFrame {
                         .addGap(26, 26, 26)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(tfSearch, javax.swing.GroupLayout.DEFAULT_SIZE, 128, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 60, Short.MAX_VALUE)
+                            .addComponent(tfSearch))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 34, Short.MAX_VALUE)
                         .addComponent(btDepWith)
                         .addGap(174, 174, 174)
                         .addComponent(btSaveLog)
@@ -265,53 +271,23 @@ public class MainForm extends javax.swing.JFrame {
         form.setVisible(true);
     }
 
-    private void filterTableByName() {
-        switch (tabIndex) {
-            case 0:
-                if (!perishableProducts.isEmpty()) {
-                    filterPerishableTableByName();
-                }
-                break;
-            case 1:
-                if (!durableProducts.isEmpty()) {
-                    filterDurableTableByName();
-                }
-                break;
-        }
-    }
-
-    private void filterPerishableTableByName() {
+    private void filterTablesByName() {
         tfSearch.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
-                filterPerishableTable(tfSearch.getText().
+                filterTables(tfSearch.getText().
                         toLowerCase());
             }
         });
     }
 
-    private void filterDurableTableByName() {
-        tfSearch.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent e) {
-                filterDurableTable(tfSearch.getText().
-                        toLowerCase());
-            }
-        });
+    private void filterTables(String search) {
+        initPerishableFiltering(search);
+        initDurableFiltering(search);
     }
 
-    private void filterPerishableTable(String search) {
-        TableRowSorter<TableModel> sorter = new TableRowSorter<>(tblPerishableProducts.getModel());
-        sorter.setRowFilter(RowFilter.regexFilter("(?i)" + search, 1));
-        tblPerishableProducts.setRowSorter(sorter);
-        refreshPerishableTable();
-    }
-
-    private void filterDurableTable(String search) {
-        TableRowSorter<TableModel> sorter = new TableRowSorter<>(tblDurableProducts.getModel());
-        sorter.setRowFilter(RowFilter.regexFilter("(?i)" + search, 1));
-        tblDurableProducts.setRowSorter(sorter);
-        refreshDurableTable();
+    private RowFilter<TableModel, Integer> getRowFilter(String search) {
+        return RowFilter.regexFilter("(?i)" + search, 0, 1);
     }
 
     private void refreshDurableTable() {
@@ -323,6 +299,20 @@ public class MainForm extends javax.swing.JFrame {
         perishableTableModel.fireTableDataChanged();
         tblPerishableProducts.repaint();
 
+    }
+
+    private void initPerishableFiltering(String search) {
+        TableRowSorter<TableModel> sorterPerishable = new TableRowSorter<>(tblPerishableProducts.getModel());
+        sorterPerishable.setRowFilter(getRowFilter(search));
+        tblPerishableProducts.setRowSorter(sorterPerishable);
+        refreshPerishableTable();
+    }
+
+    private void initDurableFiltering(String search) {
+        TableRowSorter<TableModel> sorterDurable = new TableRowSorter<>(tblDurableProducts.getModel());
+        sorterDurable.setRowFilter(getRowFilter(search));
+        tblDurableProducts.setRowSorter(sorterDurable);
+        refreshDurableTable();
     }
 
     private class PerishableProductListener implements ProductEventListener<PerishableProduct> {
@@ -469,7 +459,6 @@ public class MainForm extends javax.swing.JFrame {
     }//GEN-LAST:event_btSaveLogActionPerformed
 
     private void btDepWithActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btDepWithActionPerformed
-        // TODO add your handling code here:
         switch (tabIndex) {
             case 0:
                 if (tblPerishableProducts.getSelectedRow() > -1 && !perishableProducts.isEmpty()) {
@@ -483,6 +472,13 @@ public class MainForm extends javax.swing.JFrame {
                 break;
         }
     }//GEN-LAST:event_btDepWithActionPerformed
+
+    private void tfSearchKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tfSearchKeyTyped
+        int c = evt.getKeyChar();
+        if (!Util.isBetween(97, 122, c) && !(c == 8) && !Util.isBetween(48, 57, c)) {
+            evt.consume();
+        }
+    }//GEN-LAST:event_tfSearchKeyTyped
 
     private void initPerishableDepositWithdrawForm(List<PerishableProduct> list) {
         int index = tblPerishableProducts.getSelectedRow();

@@ -79,5 +79,4 @@ public class PerishableProductTableModel extends AbstractTableModel {
     private String formatPrice(double amount) {
         return String.format("%.2f Ft", amount);
     }
-
 }
